@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>ARKIV CMS — Halaman</title>
+<script>if(!sessionStorage.getItem("arkiv_auth")){window.location.href="/portfolio-gallery/cms/login.html";}</script>
+<script src="/portfolio-gallery/js/data.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=Space+Mono:wght@400;700&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--white:#fff;--black:#0A0A0A;--ink:#1A1A1A;--bone:#E8E2D9;--accent:#FF3D00;--bg:#F5F4F2;--sidebar:220px}
+body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--bg);display:flex;min-height:100vh}
+.cms-sidebar{width:var(--sidebar);background:var(--black);min-height:100vh;position:fixed;top:0;left:0;display:flex;flex-direction:column;z-index:50}
+.cms-logo{padding:28px 24px 20px;border-bottom:1px solid rgba(255,255,255,0.08)}
+.cms-logo h1{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:0.2em;color:var(--white)}
+.cms-logo h1 span{color:var(--accent)}
+.cms-logo p{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.25);margin-top:4px}
+.cms-nav{flex:1;padding:16px 0}
+.cms-nav-group{margin-bottom:8px}
+.cms-nav-group-label{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:0.16em;text-transform:uppercase;color:rgba(255,255,255,0.2);padding:8px 24px 4px}
+.cms-nav a{display:flex;align-items:center;gap:12px;padding:11px 24px;color:rgba(255,255,255,0.5);text-decoration:none;font-size:13px;transition:all 0.2s;border-left:2px solid transparent}
+.cms-nav a:hover{color:var(--white);background:rgba(255,255,255,0.05)}
+.cms-nav a.active{color:var(--white);border-left-color:var(--accent);background:rgba(255,62,0,0.08)}
+.cms-nav a svg{width:15px;height:15px;flex-shrink:0;opacity:0.7}
+.cms-footer{padding:20px 24px;border-top:1px solid rgba(255,255,255,0.08)}
+.cms-footer a{display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.3);text-decoration:none;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;transition:color 0.2s}
+.cms-footer a:hover{color:var(--accent)}
+.cms-footer a svg{width:13px;height:13px}
+.cms-main{margin-left:var(--sidebar);flex:1;display:flex;flex-direction:column}
+.cms-topbar{background:var(--white);border-bottom:1px solid var(--bone);padding:0 40px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40}
+.topbar-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.08em}
+.topbar-actions{display:flex;gap:10px;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:9px 20px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all 0.2s;text-decoration:none}
+.btn-primary{background:var(--accent);color:var(--white)}
+.btn-primary:hover{background:#cc3000}
+.btn-outline{background:transparent;color:var(--ink);border:1px solid var(--bone)}
+.btn-outline:hover{border-color:var(--ink)}
+.btn svg{width:14px;height:14px}
+.cms-body{display:flex;flex:1;overflow:hidden}
+
+/* PAGE TABS */
+.page-tabs{width:200px;background:var(--white);border-right:1px solid var(--bone);padding:16px 0;flex-shrink:0}
+.page-tab-item{display:flex;align-items:center;gap:12px;padding:12px 20px;cursor:pointer;transition:background 0.15s;border-left:2px solid transparent;font-size:13px;color:rgba(0,0,0,0.55)}
+.page-tab-item:hover{background:#faf9f7;color:var(--ink)}
+.page-tab-item.active{border-left-color:var(--accent);color:var(--ink);font-weight:500;background:#faf9f7}
+.page-tab-item svg{width:15px;height:15px;flex-shrink:0}
+
+/* EDITOR */
+.page-editor{flex:1;padding:32px 40px;overflow-y:auto}
+.editor-section{background:var(--white);border:1px solid var(--bone);margin-bottom:20px}
+.editor-section-header{padding:16px 24px;border-bottom:1px solid var(--bone);display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none}
+.editor-section-title{font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:0.06em;color:var(--ink)}
+.editor-section-body{padding:24px;display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.editor-section-body.cols1{grid-template-columns:1fr}
+.form-group{margin-bottom:0}
+.form-group.full{grid-column:1/-1}
+.form-label{display:block;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(0,0,0,0.5);margin-bottom:7px}
+.form-input,.form-select,.form-textarea{width:100%;padding:10px 13px;border:1px solid var(--bone);background:var(--white);font-family:'DM Sans',sans-serif;font-size:14px;color:var(--ink);outline:none;transition:border-color 0.2s;border-radius:0}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--ink)}
+.form-textarea{min-height:90px;resize:vertical}
+.form-hint{font-size:11px;color:rgba(0,0,0,0.35);margin-top:5px}
+.char-count{float:right;font-size:11px}
+.char-count.warn{color:#e67e22}
+.char-count.bad{color:#c0392b}
+.seo-meter{height:5px;background:var(--bone);margin-top:5px}
+.seo-meter-fill{height:100%;transition:width 0.4s,background 0.4s}
+.section-chevron{transition:transform 0.2s}
+.section-chevron.closed{transform:rotate(-90deg)}
+.collapsed .editor-section-body{display:none}
+.save-bar{position:sticky;bottom:0;background:var(--white);border-top:1px solid var(--bone);padding:16px 40px;display:flex;align-items:center;justify-content:space-between}
+.save-status{font-size:13px;color:rgba(0,0,0,0.4)}
+.save-status.saved{color:#27ae60}
+
+/* REPEATER */
+.repeater-item{padding:16px;background:var(--bg);border:1px solid var(--bone);margin-bottom:10px;position:relative}
+.repeater-item-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.repeater-item-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(0,0,0,0.4)}
+.repeater-actions{display:flex;gap:6px}
+.btn-xs{padding:4px 10px;font-size:11px;cursor:pointer;border:1px solid var(--bone);background:var(--white);color:rgba(0,0,0,0.5);transition:all 0.15s}
+.btn-xs:hover{border-color:var(--ink);color:var(--ink)}
+.btn-xs.danger:hover{border-color:#c0392b;color:#c0392b}
+.add-item-btn{width:100%;padding:10px;border:1px dashed var(--bone);background:transparent;cursor:pointer;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(0,0,0,0.35);transition:all 0.2s}
+.add-item-btn:hover{border-color:var(--accent);color:var(--accent)}
+</style>
+</head>
+<body>
+<aside class="cms-sidebar">
+  <div class="cms-logo"><h1>ARK<span>IV</span></h1><p>Content Management</p></div>
+  <nav class="cms-nav">
+    <div class="cms-nav-group">
+      <div class="cms-nav-group-label">Utama</div>
+      <a href="/portfolio-gallery/cms/index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</a>
+    </div>
+    <div class="cms-nav-group">
+      <div class="cms-nav-group-label">Konten</div>
+      <a href="/portfolio-gallery/cms/portfolios.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>Portfolio</a>
+      <a href="/portfolio-gallery/cms/pages.html" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/></svg>Halaman</a>
+    </div>
+    <div class="cms-nav-group">
+      <div class="cms-nav-group-label">Konfigurasi</div>
+      <a href="/portfolio-gallery/cms/settings.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Pengaturan & SEO</a>
+    </div>
+  </nav>
+  <div class="cms-footer"><a href="/portfolio-gallery/index.html" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15,3 21,3 21,9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Lihat Website</a></div>
+</aside>
+
+<div class="cms-main">
+  <div class="cms-topbar">
+    <div class="topbar-title">Edit Halaman</div>
+    <div class="topbar-actions">
+      <a id="preview-link" href="#" target="_blank" class="btn btn-outline">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        Preview
+      </a>
+      <button class="btn btn-primary" onclick="savePage()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>
+        Simpan Perubahan
+      </button>
+    </div>
+  </div>
+
+  <div class="cms-body">
+    <!-- PAGE TABS -->
+    <div class="page-tabs">
+      <div class="page-tab-item active" onclick="switchPage('about')" id="ptab-about">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        About
+      </div>
+      <div class="page-tab-item" onclick="switchPage('services')" id="ptab-services">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z"/></svg>
+        Services
+      </div>
+      <div class="page-tab-item" onclick="switchPage('contact')" id="ptab-contact">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        Contact
+      </div>
+    </div>
+
+    <!-- EDITOR AREA -->
+    <div class="page-editor" id="page-editor">
+      <!-- Dynamically filled -->
+    </div>
+  </div>
+</div>
+
+<script>
+let pages = ARKIV.getPages();
+let currentPage = 'about';
+
+const previewUrls = {
+  about: '/portfolio-gallery/about.html',
+  services: '/portfolio-gallery/services.html',
+  contact: '/portfolio-gallery/contact.html',
+};
+
+function switchPage(name) {
+  currentPage = name;
+  document.querySelectorAll('.page-tab-item').forEach(t => t.classList.remove('active'));
+  document.getElementById('ptab-' + name).classList.add('active');
+  document.getElementById('preview-link').href = previewUrls[name];
+  renderEditor();
+}
+
+function section(title, body, cols1 = false) {
+  return `
+  <div class="editor-section">
+    <div class="editor-section-header" onclick="this.parentElement.classList.toggle('collapsed')">
+      <div class="editor-section-title">${title}</div>
+      <svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><polyline points="6,9 12,15 18,9"/></svg>
+    </div>
+    <div class="editor-section-body ${cols1 ? 'cols1' : ''}">${body}</div>
+  </div>`;
+}
+
+function field(id, label, value, type = 'input', hint = '', full = false, maxch = 0) {
+  const countId = id + '_cc';
+  const countHtml = maxch ? `<span id="${countId}" class="char-count">${(value||'').length}/${maxch}</span>` : '';
+  const oninput = maxch ? `oninput="updateCC('${id}','${countId}',${maxch})"` : '';
+  const el = type === 'textarea'
+    ? `<textarea class="form-textarea" id="${id}" ${oninput}>${value||''}</textarea>`
+    : `<input class="form-input" type="text" id="${id}" value="${(value||'').replace(/"/g,'&quot;')}" ${oninput}>`;
+  return `<div class="form-group ${full ? 'full' : ''}">
+    <label class="form-label">${label} ${countHtml}</label>
+    ${el}
+    ${hint ? `<div class="form-hint">${hint}</div>` : ''}
+  </div>`;
+}
+
+function renderEditor() {
+  const p = pages[currentPage];
+  let html = '';
+
+  if (currentPage === 'about') {
+    html += section('Hero Section',
+      field('a_heroTitle','Hero Title',p.heroTitle,'input','Tampil besar di bagian atas halaman',true) +
+      field('a_heroSub','Hero Subtitle',p.heroSubtitle,'textarea','',true)
+    );
+    html += section('Biografi',
+      field('a_bioTitle','Judul Biografi',p.bioTitle) +
+      field('a_bioText','Teks Biografi',p.bioText,'textarea','Gunakan \\n untuk baris baru',true)
+    );
+
+    // Stats repeater
+    let statsHtml = p.statsItems.map((s,i) => `
+      <div class="repeater-item">
+        <div class="repeater-item-header">
+          <span class="repeater-item-label">Statistik ${i+1}</span>
+          <div class="repeater-actions">
+            <button class="btn-xs danger" onclick="removeStat(${i})">Hapus</button>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="form-group" style="margin:0"><label class="form-label">Angka</label><input class="form-input" id="stat_num_${i}" value="${s.number}"></div>
+          <div class="form-group" style="margin:0"><label class="form-label">Label</label><input class="form-input" id="stat_lbl_${i}" value="${s.label}"></div>
+        </div>
+      </div>
+    `).join('') + `<button class="add-item-btn" onclick="addStat()">+ Tambah Statistik</button>`;
+    html += section('Statistik', statsHtml, true);
+
+    // Team repeater
+    let teamHtml = p.teamMembers.map((m,i) => `
+      <div class="repeater-item">
+        <div class="repeater-item-header">
+          <span class="repeater-item-label">Anggota ${i+1}</span>
+          <div class="repeater-actions">
+            <button class="btn-xs danger" onclick="removeMember(${i})">Hapus</button>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="form-group" style="margin:0"><label class="form-label">Nama</label><input class="form-input" id="team_name_${i}" value="${m.name}"></div>
+          <div class="form-group" style="margin:0"><label class="form-label">Jabatan</label><input class="form-input" id="team_role_${i}" value="${m.role}"></div>
+          <div class="form-group full" style="margin:0;grid-column:1/-1"><label class="form-label">URL Foto</label><input class="form-input" id="team_photo_${i}" value="${m.photo}"></div>
+          <div class="form-group full" style="margin:0;grid-column:1/-1"><label class="form-label">Bio</label><textarea class="form-textarea" style="min-height:60px" id="team_bio_${i}">${m.bio}</textarea></div>
+        </div>
+      </div>
+    `).join('') + `<button class="add-item-btn" onclick="addMember()">+ Tambah Anggota Tim</button>`;
+    html += section('Tim', teamHtml, true);
+
+    html += section('SEO Halaman About',
+      seoFields('a_seoTitle','a_seoDesc','a_seoKw', p.seoTitle, p.seoDescription, p.seoKeywords)
+    );
+
+  } else if (currentPage === 'services') {
+    html += section('Hero Section',
+      field('sv_heroTitle','Hero Title',p.heroTitle) +
+      field('sv_heroSub','Hero Subtitle',p.heroSubtitle)
+    );
+
+    const iconOpts = ['camera','portrait','building','film','pen','star'];
+    let svcsHtml = p.services.map((s,i) => `
+      <div class="repeater-item">
+        <div class="repeater-item-header">
+          <span class="repeater-item-label">Layanan ${i+1}</span>
+          <div class="repeater-actions">
+            ${i>0?`<button class="btn-xs" onclick="moveSvc(${i},-1)">↑</button>`:''}
+            ${i<p.services.length-1?`<button class="btn-xs" onclick="moveSvc(${i},1)">↓</button>`:''}
+            <button class="btn-xs danger" onclick="removeSvc(${i})">Hapus</button>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="form-group" style="margin:0"><label class="form-label">Judul</label><input class="form-input" id="svc_title_${i}" value="${s.title}"></div>
+          <div class="form-group" style="margin:0">
+            <label class="form-label">Ikon</label>
+            <select class="form-select" id="svc_icon_${i}">
+              ${iconOpts.map(o=>`<option value="${o}"${o===s.icon?' selected':''}>${o}</option>`).join('')}
+            </select>
+          </div>
+          <div class="form-group full" style="margin:0;grid-column:1/-1"><label class="form-label">Deskripsi</label><textarea class="form-textarea" style="min-height:60px" id="svc_desc_${i}">${s.desc}</textarea></div>
+          <div class="form-group full" style="margin:0;grid-column:1/-1"><label class="form-label">Harga</label><input class="form-input" id="svc_price_${i}" value="${s.price}"></div>
+        </div>
+      </div>
+    `).join('') + `<button class="add-item-btn" onclick="addSvc()">+ Tambah Layanan</button>`;
+    html += section('Daftar Layanan', svcsHtml, true);
+
+    let procHtml = p.process.map((s,i) => `
+      <div class="repeater-item">
+        <div class="repeater-item-header">
+          <span class="repeater-item-label">Langkah ${i+1}</span>
+          <div class="repeater-actions"><button class="btn-xs danger" onclick="removeProc(${i})">Hapus</button></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="form-group" style="margin:0"><label class="form-label">Nomor</label><input class="form-input" id="proc_step_${i}" value="${s.step}"></div>
+          <div class="form-group" style="margin:0"><label class="form-label">Judul</label><input class="form-input" id="proc_title_${i}" value="${s.title}"></div>
+          <div class="form-group full" style="margin:0;grid-column:1/-1"><label class="form-label">Deskripsi</label><textarea class="form-textarea" style="min-height:60px" id="proc_desc_${i}">${s.desc}</textarea></div>
+        </div>
+      </div>
+    `).join('') + `<button class="add-item-btn" onclick="addProc()">+ Tambah Langkah</button>`;
+    html += section('Proses Kerja', procHtml, true);
+    html += section('SEO Halaman Services', seoFields('sv_seoTitle','sv_seoDesc','sv_seoKw', p.seoTitle, p.seoDescription, p.seoKeywords));
+
+  } else if (currentPage === 'contact') {
+    html += section('Hero & Form',
+      field('ct_heroTitle','Hero Title',p.heroTitle) +
+      field('ct_heroSub','Hero Subtitle',p.heroSubtitle) +
+      field('ct_formTitle','Judul Form',p.formTitle)
+    );
+    html += section('SEO Halaman Contact', seoFields('ct_seoTitle','ct_seoDesc','ct_seoKw', p.seoTitle, p.seoDescription, p.seoKeywords));
+  }
+
+  document.getElementById('page-editor').innerHTML = html;
+}
+
+function seoFields(titleId, descId, kwId, titleVal, descVal, kwVal) {
+  const tLen = (titleVal||'').length;
+  const dLen = (descVal||'').length;
+  return `
+    <div class="form-group full">
+      <label class="form-label">SEO Title <span id="${titleId}_cc" class="char-count">${tLen}/60</span></label>
+      <input class="form-input" id="${titleId}" value="${(titleVal||'').replace(/"/g,'&quot;')}" oninput="updateSEOMeter('${titleId}','${titleId}_cc',60,'${titleId}_m')">
+      <div class="seo-meter"><div class="seo-meter-fill" id="${titleId}_m" style="width:${Math.min(tLen/60*100,100)}%;background:${tLen<30?'#e67e22':tLen<=60?'#27ae60':'#c0392b'}"></div></div>
+    </div>
+    <div class="form-group full">
+      <label class="form-label">Meta Description <span id="${descId}_cc" class="char-count">${dLen}/160</span></label>
+      <textarea class="form-textarea" style="min-height:70px" id="${descId}" oninput="updateSEOMeter('${descId}','${descId}_cc',160,'${descId}_m')">${descVal||''}</textarea>
+      <div class="seo-meter"><div class="seo-meter-fill" id="${descId}_m" style="width:${Math.min(dLen/160*100,100)}%;background:${dLen<80?'#e67e22':dLen<=160?'#27ae60':'#c0392b'}"></div></div>
+    </div>
+    <div class="form-group full">
+      <label class="form-label">Keywords</label>
+      <input class="form-input" id="${kwId}" value="${(kwVal||'').replace(/"/g,'&quot;')}">
+    </div>`;
+}
+
+function updateCC(id, countId, max) {
+  const len = document.getElementById(id).value.length;
+  const el = document.getElementById(countId);
+  if (!el) return;
+  el.textContent = `${len}/${max}`;
+  el.className = 'char-count' + (len > max ? ' bad' : len > max * 0.9 ? ' warn' : '');
+}
+
+function updateSEOMeter(id, countId, max, meterId) {
+  const val = document.getElementById(id).value;
+  const len = val.length;
+  const el = document.getElementById(countId);
+  if (el) { el.textContent = `${len}/${max}`; el.className = 'char-count' + (len > max ? ' bad' : len > max*0.9 ? ' warn' : ''); }
+  const m = document.getElementById(meterId);
+  if (m) { m.style.width = Math.min(len/max*100,100)+'%'; m.style.background = len < max*0.5 ? '#e67e22' : len <= max ? '#27ae60' : '#c0392b'; }
+}
+
+function g(id) { const el = document.getElementById(id); return el ? el.value : ''; }
+
+function savePage() {
+  const p = pages[currentPage];
+  if (currentPage === 'about') {
+    p.heroTitle = g('a_heroTitle'); p.heroSubtitle = g('a_heroSub');
+    p.bioTitle = g('a_bioTitle'); p.bioText = g('a_bioText');
+    p.statsItems = p.statsItems.map((_,i) => ({ number: g(`stat_num_${i}`), label: g(`stat_lbl_${i}`) }));
+    p.teamMembers = p.teamMembers.map((_,i) => ({ name: g(`team_name_${i}`), role: g(`team_role_${i}`), photo: g(`team_photo_${i}`), bio: g(`team_bio_${i}`) }));
+    p.seoTitle = g('a_seoTitle'); p.seoDescription = g('a_seoDesc'); p.seoKeywords = g('a_seoKw');
+  } else if (currentPage === 'services') {
+    p.heroTitle = g('sv_heroTitle'); p.heroSubtitle = g('sv_heroSub');
+    p.services = p.services.map((_,i) => ({ icon: g(`svc_icon_${i}`), title: g(`svc_title_${i}`), desc: g(`svc_desc_${i}`), price: g(`svc_price_${i}`) }));
+    p.process = p.process.map((_,i) => ({ step: g(`proc_step_${i}`), title: g(`proc_title_${i}`), desc: g(`proc_desc_${i}`) }));
+    p.seoTitle = g('sv_seoTitle'); p.seoDescription = g('sv_seoDesc'); p.seoKeywords = g('sv_seoKw');
+  } else if (currentPage === 'contact') {
+    p.heroTitle = g('ct_heroTitle'); p.heroSubtitle = g('ct_heroSub'); p.formTitle = g('ct_formTitle');
+    p.seoTitle = g('ct_seoTitle'); p.seoDescription = g('ct_seoDesc'); p.seoKeywords = g('ct_seoKw');
+  }
+  ARKIV.setPages(pages);
+  showSaved();
+}
+
+function showSaved() {
+  const btn = document.querySelector('.btn-primary');
+  const orig = btn.textContent;
+  btn.textContent = '✓ Tersimpan!';
+  btn.style.background = '#27ae60';
+  setTimeout(() => { btn.textContent = orig; btn.style.background = ''; }, 2000);
+}
+
+// Repeater mutations — re-render after mutation
+function removeStat(i)  { readAndMutate(() => { pages.about.statsItems.splice(i,1); }); }
+function addStat()       { readAndMutate(() => { pages.about.statsItems.push({number:'0',label:'Label'}); }); }
+function removeMember(i){ readAndMutate(() => { pages.about.teamMembers.splice(i,1); }); }
+function addMember()    { readAndMutate(() => { pages.about.teamMembers.push({name:'Nama',role:'Jabatan',photo:'https://picsum.photos/seed/newteam/400/400',bio:''}); }); }
+function removeSvc(i)   { readAndMutate(() => { pages.services.services.splice(i,1); }); }
+function addSvc()       { readAndMutate(() => { pages.services.services.push({icon:'camera',title:'Layanan Baru',desc:'',price:''}); }); }
+function moveSvc(i,d)   { readAndMutate(() => { const j=i+d; [pages.services.services[i],pages.services.services[j]]=[pages.services.services[j],pages.services.services[i]]; }); }
+function removeProc(i)  { readAndMutate(() => { pages.services.process.splice(i,1); }); }
+function addProc()      { readAndMutate(() => { pages.services.process.push({step:`0${pages.services.process.length+1}`,title:'Langkah Baru',desc:''}); }); }
+
+function readAndMutate(fn) {
+  // Capture current field values before re-render
+  savePage();
+  fn();
+  renderEditor();
+}
+
+// Init
+switchPage('about');
+</script>
+</body>
+</html>

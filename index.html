@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>ARKIV — Portfolio</title>
+<script src="/portfolio-gallery/js/data.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=Space+Mono:wght@400;700&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--white:#fff;--black:#0A0A0A;--ink:#1A1A1A;--bone:#E8E2D9;--accent:#FF3D00;--sidebar-w:72px;--sidebar-expanded:260px}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--white);font-family:'DM Sans',sans-serif;color:var(--ink)}
+/* SIDEBAR */
+#sidebar{position:fixed;left:0;top:0;width:var(--sidebar-w);height:100vh;background:var(--black);z-index:100;display:flex;flex-direction:column;align-items:center;padding:28px 0;transition:width 0.5s cubic-bezier(0.16,1,0.3,1);overflow:hidden}
+#sidebar:hover{width:var(--sidebar-expanded)}
+.sidebar-logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.15em;color:var(--white);writing-mode:vertical-rl;text-orientation:mixed;transform:rotate(180deg);transition:all 0.5s cubic-bezier(0.16,1,0.3,1);white-space:nowrap;cursor:pointer;position:absolute;top:28px}
+#sidebar:hover .sidebar-logo{writing-mode:horizontal-tb;transform:rotate(0deg);font-size:28px;letter-spacing:0.25em;top:32px;left:24px}
+.sidebar-logo span{color:var(--accent)}
+.nav-links{list-style:none;margin-top:120px;width:100%}
+.nav-links li{overflow:hidden;position:relative}
+.nav-links a{display:flex;align-items:center;gap:16px;padding:14px 24px;color:rgba(255,255,255,0.45);text-decoration:none;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;white-space:nowrap;transition:color 0.3s,padding-left 0.4s cubic-bezier(0.16,1,0.3,1);position:relative}
+.nav-links a::before{content:'';position:absolute;left:0;top:0;width:3px;height:100%;background:var(--accent);transform:scaleY(0);transition:transform 0.3s cubic-bezier(0.16,1,0.3,1)}
+.nav-links a:hover::before,.nav-links a.active::before{transform:scaleY(1)}
+.nav-links a:hover,.nav-links a.active{color:var(--white);padding-left:32px}
+.nav-icon{width:20px;height:20px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.nav-icon svg{width:18px;height:18px}
+.nav-label{opacity:0;transform:translateX(-10px);transition:opacity 0.4s 0.1s,transform 0.4s 0.1s cubic-bezier(0.16,1,0.3,1)}
+#sidebar:hover .nav-label{opacity:1;transform:translateX(0)}
+#sidebar:hover .nav-links a:hover .nav-label{font-size:13px;letter-spacing:0.2em}
+.sidebar-bottom{margin-top:auto;padding:0 24px;width:100%;opacity:0;transform:translateY(10px);transition:opacity 0.4s 0.15s,transform 0.4s 0.15s}
+#sidebar:hover .sidebar-bottom{opacity:1;transform:translateY(0)}
+.sidebar-bottom p{font-family:'Space Mono',monospace;font-size:9px;color:rgba(255,255,255,0.2);letter-spacing:0.1em;text-transform:uppercase;white-space:nowrap}
+#sidebar::after{content:'';position:absolute;right:0;top:0;width:1px;height:0%;background:var(--accent);transition:height 0.6s cubic-bezier(0.16,1,0.3,1)}
+#sidebar:hover::after{height:100%}
+/* MAIN */
+#main{position:fixed;left:var(--sidebar-w);top:0;right:0;height:100vh;overflow-x:auto;overflow-y:hidden;transition:left 0.5s cubic-bezier(0.16,1,0.3,1);cursor:grab;scrollbar-width:none}
+#main::-webkit-scrollbar{display:none}
+#main:active{cursor:grabbing}
+#gallery-track{display:flex;align-items:stretch;height:100vh;width:max-content}
+.masonry-col{display:flex;flex-direction:column;height:100vh;flex-shrink:0;width:320px}
+/* GALLERY ITEM */
+.gallery-item{position:relative;overflow:hidden;cursor:pointer;flex-shrink:0;width:100%}
+.gallery-item img{width:100%;height:100%;object-fit:cover;display:block;filter:grayscale(1) brightness(0.85);transition:filter 0.6s cubic-bezier(0.16,1,0.3,1),transform 0.7s cubic-bezier(0.16,1,0.3,1)}
+.gallery-item:hover img{filter:grayscale(0) brightness(1);transform:scale(1.06)}
+.item-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.75) 0%,transparent 55%);opacity:0;transition:opacity 0.5s cubic-bezier(0.16,1,0.3,1);display:flex;flex-direction:column;justify-content:flex-end;padding:24px 20px 20px;pointer-events:none}
+.gallery-item:hover .item-overlay{opacity:1}
+.item-category{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);margin-bottom:6px;transform:translateY(12px);transition:transform 0.5s 0.05s cubic-bezier(0.16,1,0.3,1)}
+.gallery-item:hover .item-category{transform:translateY(0)}
+.item-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.06em;color:var(--white);line-height:1.05;transform:translateY(16px);transition:transform 0.5s 0.1s cubic-bezier(0.16,1,0.3,1)}
+.gallery-item:hover .item-title{transform:translateY(0)}
+/* SCROLL HINT */
+#scroll-hint{position:fixed;right:32px;bottom:32px;display:flex;align-items:center;gap:10px;z-index:50;opacity:1;transition:opacity 0.6s;pointer-events:none}
+#scroll-hint.hide{opacity:0}
+#scroll-hint p{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:rgba(0,0,0,0.35)}
+.hint-arrow{display:flex;gap:3px;animation:arrow-pulse 1.8s ease-in-out infinite}
+.hint-arrow span{display:block;width:6px;height:6px;border-right:1.5px solid rgba(0,0,0,0.35);border-top:1.5px solid rgba(0,0,0,0.35);transform:rotate(45deg)}
+.hint-arrow span:nth-child(2){opacity:0.6;margin-left:-2px}
+.hint-arrow span:nth-child(3){opacity:0.3;margin-left:-2px}
+@keyframes arrow-pulse{0%,100%{transform:translateX(0)}50%{transform:translateX(5px)}}
+/* CMS LINK */
+#cms-link{position:fixed;right:32px;top:24px;z-index:90;opacity:0;transition:opacity 0.3s}
+#cms-link:hover{opacity:1!important}
+body:hover #cms-link{opacity:0.3}
+#cms-link a{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(0,0,0,0.6);text-decoration:none;padding:6px 12px;border:1px solid var(--bone);background:rgba(255,255,255,0.8);backdrop-filter:blur(4px)}
+#cms-link a:hover{background:var(--accent);color:var(--white);border-color:var(--accent)}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR (rendered by JS) -->
+<div id="sidebar-mount"></div>
+
+<!-- GALLERY -->
+<main id="main">
+  <div id="gallery-track"></div>
+</main>
+
+<!-- SCROLL HINT -->
+<div id="scroll-hint">
+  <p>Scroll</p>
+  <div class="hint-arrow"><span></span><span></span><span></span></div>
+</div>
+
+<!-- CMS shortcut -->
+<div id="cms-link"><a href="/portfolio-gallery/cms/login.html">⚙ CMS</a></div>
+
+<script>
+// ── INIT SEO ──
+const s = ARKIV.getSettings();
+ARKIV.injectSEO({ title: s.defaultSeoTitle, description: s.defaultSeoDescription, keywords: s.defaultSeoKeywords, canonical: s.siteUrl });
+ARKIV.injectOrganizationLD();
+
+// ── RENDER SIDEBAR ──
+document.getElementById('sidebar-mount').innerHTML = ARKIV.renderSidebar('gallery');
+
+// ── GALLERY BUILD ──
+const heightPatterns = [[55,45],[35,65],[65,35],[45,55],[60,40],[40,60]];
+
+function buildGallery() {
+  const track = document.getElementById('gallery-track');
+  track.innerHTML = '';
+  const portfolios = ARKIV.getPortfolios().filter(p => p.visible !== false).sort((a,b)=>(a.order||99)-(b.order||99));
+
+  portfolios.forEach((p, i) => {
+    const pattern = heightPatterns[i % heightPatterns.length];
+    const col = document.createElement('div');
+    col.className = 'masonry-col';
+
+    [0, 1].forEach(slot => {
+      // Pick a different portfolio for the second slot in each column
+      const pairIdx = slot === 0 ? i : (i + Math.floor(portfolios.length / 2)) % portfolios.length;
+      const pData = portfolios[pairIdx] || p;
+      const h = pattern[slot];
+
+      const item = document.createElement('div');
+      item.className = 'gallery-item';
+      item.style.height = h + 'vh';
+      item.dataset.slug = pData.slug;
+      item.dataset.id = pData.id;
+
+      const img = document.createElement('img');
+      img.src = pData.thumbnail;
+      img.alt = pData.title;
+      img.loading = slot === 0 ? 'eager' : 'lazy';
+
+      const overlay = document.createElement('div');
+      overlay.className = 'item-overlay';
+      overlay.innerHTML = `<div class="item-category">${pData.category}</div><div class="item-title">${pData.title}</div>`;
+
+      item.appendChild(img); item.appendChild(overlay);
+      col.appendChild(item);
+    });
+
+    track.appendChild(col);
+  });
+}
+
+// ── PROXIMITY COLOR EFFECT ──
+function setupProximityEffect() {
+  const main = document.getElementById('main');
+  main.addEventListener('mousemove', e => {
+    document.querySelectorAll('.gallery-item').forEach(item => {
+      if (item.matches(':hover')) return;
+      const rect = item.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const dist = Math.hypot(e.clientX - cx, e.clientY - cy);
+      const prox = Math.max(0, 1 - dist / 300);
+      const img = item.querySelector('img');
+      if (img) {
+        img.style.filter = prox > 0.05
+          ? `grayscale(${Math.round((1-prox)*100)}%) brightness(${0.85 + prox*0.15})`
+          : '';
+        img.style.transform = prox > 0.05 ? `scale(${1 + prox*0.025})` : '';
+      }
+    });
+  });
+  main.addEventListener('mouseleave', () => {
+    document.querySelectorAll('.gallery-item img').forEach(img => {
+      img.style.filter = ''; img.style.transform = '';
+    });
+  });
+}
+
+// ── CLICK → DETAIL ──
+document.getElementById('gallery-track').addEventListener('click', e => {
+  const item = e.target.closest('.gallery-item');
+  if (item) {
+    window.location.href = `/portfolio-gallery/portfolio-detail.html?slug=${item.dataset.slug}`;
+  }
+});
+
+// ── DRAG SCROLL ──
+function setupDragScroll() {
+  const main = document.getElementById('main');
+  let isDown = false, startX, scrollLeft;
+  main.addEventListener('mousedown', e => { isDown=true; startX=e.pageX-main.offsetLeft; scrollLeft=main.scrollLeft; main.style.userSelect='none'; });
+  document.addEventListener('mouseup', () => { isDown=false; main.style.userSelect=''; });
+  main.addEventListener('mousemove', e => { if(!isDown) return; e.preventDefault(); main.scrollLeft = scrollLeft - (e.pageX - main.offsetLeft - startX)*1.5; });
+  main.addEventListener('wheel', e => { e.preventDefault(); main.scrollLeft += e.deltaY*1.2 + e.deltaX; }, { passive: false });
+  main.addEventListener('scroll', () => { if(main.scrollLeft>50) document.getElementById('scroll-hint').classList.add('hide'); }, { once: true });
+}
+
+// ── START ──
+buildGallery();
+setupProximityEffect();
+setupDragScroll();
+</script>
+</body>
+</html>

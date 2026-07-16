@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Kontak ARKIV</title>
+<script src="/portfolio-gallery/js/data.js"></script>
+<style id="shared-style"></style>
+<style>
+.contact-wrap { display: grid; grid-template-columns: 1fr 1fr; min-height: 100vh; }
+
+/* LEFT */
+.contact-left {
+  background: var(--black); padding: 80px 64px; display: flex;
+  flex-direction: column; justify-content: space-between; position: relative; overflow: hidden;
+}
+.contact-left::after {
+  content: ''; position: absolute; right: 0; top: 0; width: 1px; height: 0;
+  background: var(--accent); animation: lineGrow 1s 0.4s cubic-bezier(0.16,1,0.3,1) forwards;
+}
+@keyframes lineGrow { to { height: 100%; } }
+.contact-eyebrow { font-family:'Space Mono',monospace; font-size:10px; letter-spacing:0.22em; text-transform:uppercase; color:var(--accent); margin-bottom:20px; }
+.contact-title { font-family:'Bebas Neue',sans-serif; font-size:clamp(52px,8vw,96px); letter-spacing:0.03em; line-height:0.9; color:var(--white); margin-bottom:24px; }
+.contact-sub { font-size:15px; line-height:1.75; color:rgba(255,255,255,0.45); max-width:380px; font-weight:300; margin-bottom:56px; }
+
+.contact-info { }
+.info-item { margin-bottom:32px; }
+.info-label { font-family:'Space Mono',monospace; font-size:9px; letter-spacing:0.18em; text-transform:uppercase; color:rgba(255,255,255,0.3); margin-bottom:6px; }
+.info-value { font-size:15px; color:var(--white); font-weight:300; }
+.info-value a { color: var(--white); text-decoration: none; }
+.info-value a:hover { color: var(--accent); }
+
+.social-links { display:flex; gap:20px; flex-wrap:wrap; }
+.social-link { font-family:'Space Mono',monospace; font-size:9px; letter-spacing:0.14em; text-transform:uppercase; color:rgba(255,255,255,0.35); text-decoration:none; transition:color 0.2s; }
+.social-link:hover { color:var(--accent); }
+
+/* RIGHT */
+.contact-right { padding: 80px 64px; display: flex; flex-direction: column; justify-content: center; }
+.form-title { font-family:'Bebas Neue',sans-serif; font-size:36px; letter-spacing:0.06em; color:var(--ink); margin-bottom:40px; }
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.form-group { margin-bottom: 24px; }
+.form-group.full { grid-column: 1 / -1; }
+.form-label { display:block; font-family:'Space Mono',monospace; font-size:9px; letter-spacing:0.16em; text-transform:uppercase; color:rgba(26,26,26,0.5); margin-bottom:8px; }
+.form-input, .form-select, .form-textarea {
+  width:100%; padding:14px 16px; border:1px solid var(--bone); background:transparent;
+  font-family:'DM Sans',sans-serif; font-size:15px; color:var(--ink); outline:none;
+  transition:border-color 0.2s;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus { border-color:var(--ink); }
+.form-textarea { height:140px; resize:vertical; }
+.form-select { appearance:none; cursor:pointer; }
+.submit-btn {
+  width:100%; padding:18px; background:var(--ink); color:var(--white);
+  border:none; font-family:'Space Mono',monospace; font-size:11px; letter-spacing:0.2em;
+  text-transform:uppercase; cursor:pointer; transition:background 0.2s, transform 0.2s; margin-top:8px;
+}
+.submit-btn:hover { background:var(--accent); transform:translateY(-2px); }
+.form-success {
+  display:none; padding:16px 20px; background:#f0faf0; border-left:3px solid #4caf50;
+  font-size:14px; color:#2e7d32; margin-top:16px;
+}
+.form-success.show { display:block; }
+</style>
+</head>
+<body>
+<div id="sidebar-mount"></div>
+<div id="page-content" style="margin-left:var(--sidebar-w)">
+  <div class="contact-wrap">
+    <div class="contact-left">
+      <div>
+        <div class="contact-eyebrow">Get In Touch</div>
+        <h1 class="contact-title" id="contact-title">Mari Bicara</h1>
+        <p class="contact-sub" id="contact-sub"></p>
+      </div>
+      <div class="contact-info" id="contact-info"></div>
+    </div>
+    <div class="contact-right">
+      <div class="form-title" id="form-title">Kirim Pesan</div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Nama Lengkap</label><input class="form-input" type="text" placeholder="Nama Anda" id="f-name"></div>
+        <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" placeholder="email@anda.com" id="f-email"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Layanan yang Dibutuhkan</label>
+        <select class="form-select" id="f-service">
+          <option value="">Pilih layanan...</option>
+          <option>Commercial Photography</option>
+          <option>Portrait & People</option>
+          <option>Architecture & Interior</option>
+          <option>Video Production</option>
+          <option>Visual Identity</option>
+          <option>Event Documentation</option>
+          <option>Lainnya</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">Pesan</label><textarea class="form-textarea" placeholder="Ceritakan proyek Anda..." id="f-msg"></textarea></div>
+      <button class="submit-btn" onclick="submitForm()">Kirim Pesan →</button>
+      <div class="form-success" id="form-success">Terima kasih! Pesan Anda telah diterima. Kami akan menghubungi Anda dalam 1×24 jam.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.getElementById('shared-style').textContent = ARKIV.getSharedCSS();
+document.getElementById('sidebar-mount').innerHTML = ARKIV.renderSidebar('contact');
+
+const s = ARKIV.getSettings();
+const p = ARKIV.getPages().contact;
+
+ARKIV.injectSEO({ title: p.seoTitle, description: p.seoDescription, keywords: p.seoKeywords, canonical: s.siteUrl + '/contact' });
+ARKIV.injectOrganizationLD();
+
+document.getElementById('contact-title').textContent = p.heroTitle;
+document.getElementById('contact-sub').textContent = p.heroSubtitle;
+document.getElementById('form-title').textContent = p.formTitle;
+
+document.getElementById('contact-info').innerHTML = `
+  <div class="info-item"><div class="info-label">Email</div><div class="info-value"><a href="mailto:${s.siteEmail}">${s.siteEmail}</a></div></div>
+  <div class="info-item"><div class="info-label">Telepon</div><div class="info-value"><a href="tel:${s.sitePhone}">${s.sitePhone}</a></div></div>
+  <div class="info-item"><div class="info-label">Alamat</div><div class="info-value">${s.siteAddress}</div></div>
+  <div class="info-item">
+    <div class="info-label">Sosial Media</div>
+    <div class="social-links">
+      ${s.siteInstagram ? `<a class="social-link" href="#">Instagram</a>` : ''}
+      ${s.siteBehance ? `<a class="social-link" href="#">Behance</a>` : ''}
+      ${s.siteLinkedin ? `<a class="social-link" href="#">LinkedIn</a>` : ''}
+    </div>
+  </div>
+`;
+
+function submitForm() {
+  const name = document.getElementById('f-name').value;
+  const email = document.getElementById('f-email').value;
+  if (!name || !email) { alert('Mohon isi nama dan email Anda.'); return; }
+  document.getElementById('form-success').classList.add('show');
+  document.getElementById('f-name').value = '';
+  document.getElementById('f-email').value = '';
+  document.getElementById('f-service').value = '';
+  document.getElementById('f-msg').value = '';
+}
+</script>
+</body>
+</html>

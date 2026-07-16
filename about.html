@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Tentang ARKIV</title>
+<script src="/portfolio-gallery/js/data.js"></script>
+<style id="shared-style"></style>
+<style>
+.page-hero {
+  min-height: 100vh; display: flex; align-items: flex-end;
+  padding: 80px 64px; position: relative; overflow: hidden; background: var(--black);
+}
+.hero-bg {
+  position: absolute; inset: 0; background: url('https://picsum.photos/seed/about-hero/1400/900') center/cover;
+  opacity: 0.25; filter: grayscale(1);
+}
+.hero-content { position: relative; z-index: 2; max-width: 720px; }
+.hero-eyebrow {
+  font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--accent); margin-bottom: 20px;
+}
+.hero-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(52px, 8vw, 110px); letter-spacing: 0.03em; line-height: 0.92;
+  color: var(--white); white-space: pre-line; margin-bottom: 28px;
+}
+.hero-sub { font-size: 17px; line-height: 1.7; color: rgba(255,255,255,0.55); max-width: 480px; font-weight: 300; }
+
+/* STATS */
+.stats-section { padding: 80px 64px; border-bottom: 1px solid var(--bone); display: flex; gap: 0; }
+.stat-item { flex: 1; padding-right: 40px; }
+.stat-number {
+  font-family: 'Bebas Neue', sans-serif; font-size: 72px; letter-spacing: 0.02em;
+  line-height: 1; color: var(--ink); margin-bottom: 6px;
+}
+.stat-label { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(0,0,0,0.4); }
+
+/* BIO */
+.bio-section { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; padding: 96px 64px; align-items: start; }
+.bio-label { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 20px; }
+.bio-heading { font-family: 'Bebas Neue', sans-serif; font-size: clamp(40px,5vw,64px); letter-spacing: 0.04em; line-height: 1; color: var(--ink); margin-bottom: 32px; }
+.bio-text { font-size: 16px; line-height: 1.85; color: rgba(26,26,26,0.68); font-weight: 300; white-space: pre-line; }
+.bio-image { width: 100%; aspect-ratio: 4/5; object-fit: cover; }
+
+/* TEAM */
+.team-section { padding: 80px 64px 100px; background: #f8f8f6; }
+.section-header { margin-bottom: 56px; }
+.section-label { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+.section-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(36px,4.5vw,58px); letter-spacing: 0.04em; color: var(--ink); }
+.team-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+.team-card { }
+.team-photo { width: 100%; aspect-ratio: 1; object-fit: cover; margin-bottom: 20px; filter: grayscale(0.3); transition: filter 0.4s; }
+.team-card:hover .team-photo { filter: grayscale(0); }
+.team-name { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 0.06em; color: var(--ink); margin-bottom: 4px; }
+.team-role { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+.team-bio { font-size: 13px; line-height: 1.7; color: rgba(26,26,26,0.58); }
+</style>
+</head>
+<body>
+<div id="sidebar-mount"></div>
+<div id="page-content">
+  <!-- HERO -->
+  <section class="page-hero">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+      <div class="hero-eyebrow">Studio — Yogyakarta, Indonesia</div>
+      <h1 class="hero-title" id="about-hero-title">Loading...</h1>
+      <p class="hero-sub" id="about-hero-sub"></p>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section class="stats-section" id="stats-section"></section>
+
+  <!-- BIO -->
+  <section class="bio-section">
+    <div>
+      <div class="bio-label" id="bio-label">Tentang Kami</div>
+      <h2 class="bio-heading" id="bio-title"></h2>
+      <p class="bio-text" id="bio-text"></p>
+    </div>
+    <img class="bio-image" src="https://picsum.photos/seed/about-bio/700/900" alt="ARKIV Studio">
+  </section>
+
+  <!-- TEAM -->
+  <section class="team-section">
+    <div class="section-header">
+      <div class="section-label">Tim Kami</div>
+      <h2 class="section-title">Orang-orang di Balik Lensa</h2>
+    </div>
+    <div class="team-grid" id="team-grid"></div>
+  </section>
+</div>
+
+<script>
+  document.getElementById('shared-style').textContent = ARKIV.getSharedCSS();
+  document.getElementById('sidebar-mount').innerHTML = ARKIV.renderSidebar('about');
+
+  const p = ARKIV.getPages();
+  const a = p.about;
+
+  ARKIV.injectSEO({ title: a.seoTitle, description: a.seoDescription, keywords: a.seoKeywords, canonical: ARKIV.getSettings().siteUrl + '/about', type: 'website' });
+  ARKIV.injectOrganizationLD();
+
+  document.getElementById('about-hero-title').textContent = a.heroTitle;
+  document.getElementById('about-hero-sub').textContent = a.heroSubtitle;
+  document.getElementById('bio-title').textContent = a.bioTitle;
+  document.getElementById('bio-text').textContent = a.bioText;
+
+  // Stats
+  const statsEl = document.getElementById('stats-section');
+  statsEl.innerHTML = a.statsItems.map(s => `
+    <div class="stat-item">
+      <div class="stat-number">${s.number}</div>
+      <div class="stat-label">${s.label}</div>
+    </div>
+  `).join('');
+
+  // Team
+  const teamEl = document.getElementById('team-grid');
+  teamEl.innerHTML = a.teamMembers.map(m => `
+    <div class="team-card">
+      <img class="team-photo" src="${m.photo}" alt="${m.name}">
+      <div class="team-name">${m.name}</div>
+      <div class="team-role">${m.role}</div>
+      <p class="team-bio">${m.bio}</p>
+    </div>
+  `).join('');
+</script>
+</body>
+</html>

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Portfolio Detail — ARKIV</title>
+<script src="/portfolio-gallery/js/data.js"></script>
+<style id="shared-style"></style>
+<style>
+#page-content { margin-left: var(--sidebar-w); }
+.detail-hero {
+  position: relative; height: 75vh; overflow: hidden; background: var(--black);
+}
+.detail-hero-img {
+  width: 100%; height: 100%; object-fit: cover;
+  filter: brightness(0.55); transition: transform 8s linear;
+}
+.detail-hero:hover .detail-hero-img { transform: scale(1.05); }
+.detail-hero-content {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 60px 64px;
+  background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%);
+}
+.detail-breadcrumb {
+  display: flex; gap: 12px; align-items: center; margin-bottom: 16px;
+}
+.detail-breadcrumb a, .detail-breadcrumb span {
+  font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 0.16em;
+  text-transform: uppercase; color: rgba(255,255,255,0.45); text-decoration: none;
+}
+.detail-breadcrumb a:hover { color: var(--accent); }
+.detail-breadcrumb .sep { color: rgba(255,255,255,0.2); }
+.detail-category { font-family:'Space Mono',monospace; font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:var(--accent); margin-bottom:10px; }
+.detail-title { font-family:'Bebas Neue',sans-serif; font-size:clamp(52px,8vw,100px); letter-spacing:0.03em; line-height:0.92; color:var(--white); }
+
+/* META BAR */
+.detail-meta-bar {
+  display: flex; gap: 0; border-bottom: 1px solid var(--bone);
+}
+.meta-cell {
+  flex: 1; padding: 28px 40px; border-right: 1px solid var(--bone);
+}
+.meta-cell:last-child { border-right: none; }
+.meta-cell label { display:block; font-family:'Space Mono',monospace; font-size:9px; letter-spacing:0.16em; text-transform:uppercase; color:rgba(0,0,0,0.35); margin-bottom:6px; }
+.meta-cell span { font-size:15px; color:var(--ink); }
+
+/* CONTENT */
+.detail-body { padding: 64px; max-width: 880px; }
+.detail-desc { font-size:17px; line-height:1.85; color:rgba(26,26,26,0.68); font-weight:300; margin-bottom:64px; }
+
+/* MEDIA GRID */
+.detail-media { padding: 0 64px 80px; }
+.media-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 8px; }
+.media-item { overflow: hidden; background: var(--bone); }
+.media-item:nth-child(1) { grid-column: span 12; }
+.media-item:nth-child(2) { grid-column: span 7; }
+.media-item:nth-child(3) { grid-column: span 5; }
+.media-item:nth-child(4) { grid-column: span 5; }
+.media-item:nth-child(5) { grid-column: span 7; }
+.media-item:nth-child(n+6) { grid-column: span 4; }
+.media-item img, .media-item video {
+  width: 100%; display: block; object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.16,1,0.3,1);
+}
+.media-item:nth-child(1) img, .media-item:nth-child(1) video { aspect-ratio: 16/7; }
+.media-item:not(:nth-child(1)) img, .media-item:not(:nth-child(1)) video { aspect-ratio: 4/3; }
+.media-item:hover img, .media-item:hover video { transform: scale(1.04); }
+.media-caption { padding: 10px 14px; font-family:'Space Mono',monospace; font-size:9px; letter-spacing:0.12em; text-transform:uppercase; color:rgba(0,0,0,0.35); }
+
+/* RELATED */
+.related-section { padding: 0 64px 80px; }
+.related-label { font-family:'Space Mono',monospace; font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:var(--accent); margin-bottom:24px; }
+.related-title { font-family:'Bebas Neue',sans-serif; font-size:40px; letter-spacing:0.04em; color:var(--ink); margin-bottom:32px; }
+.related-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+.related-item { position:relative; overflow:hidden; cursor:pointer; }
+.related-item img { width:100%; aspect-ratio:4/3; object-fit:cover; filter:grayscale(1) brightness(0.8); transition:filter 0.5s,transform 0.5s; display:block; }
+.related-item:hover img { filter:grayscale(0) brightness(1); transform:scale(1.04); }
+.related-item-info { position:absolute; bottom:0; left:0; right:0; padding:16px 14px; background:linear-gradient(to top,rgba(0,0,0,0.7),transparent); opacity:0; transition:opacity 0.4s; }
+.related-item:hover .related-item-info { opacity:1; }
+.related-item-cat { font-family:'Space Mono',monospace; font-size:8px; letter-spacing:0.15em; text-transform:uppercase; color:var(--accent); }
+.related-item-name { font-family:'Bebas Neue',sans-serif; font-size:18px; letter-spacing:0.05em; color:var(--white); }
+
+/* NAV ARROWS */
+.detail-nav {
+  display: flex; justify-content: space-between; padding: 32px 64px;
+  border-top: 1px solid var(--bone);
+}
+.nav-arrow {
+  display: flex; align-items: center; gap: 12px; text-decoration: none;
+  font-family:'Space Mono',monospace; font-size:10px; letter-spacing:0.15em;
+  text-transform:uppercase; color:rgba(0,0,0,0.4); transition:color 0.2s;
+}
+.nav-arrow:hover { color: var(--ink); }
+.nav-arrow svg { width:20px; height:20px; }
+.nav-arrow-title { font-family:'Bebas Neue',sans-serif; font-size:18px; letter-spacing:0.04em; color:var(--ink); display:block; margin-top:2px; }
+</style>
+</head>
+<body>
+<div id="sidebar-mount"></div>
+<div id="page-content">
+  <div id="detail-root"></div>
+</div>
+
+<script>
+document.getElementById('shared-style').textContent = ARKIV.getSharedCSS();
+document.getElementById('sidebar-mount').innerHTML = ARKIV.renderSidebar('gallery');
+
+function getParam(key) {
+  return new URLSearchParams(location.search).get(key);
+}
+
+function render() {
+  const slug = getParam('slug');
+  const id = getParam('id');
+  const portfolios = ARKIV.getPortfolios();
+  const p = slug ? ARKIV.getPortfolioBySlug(slug) : ARKIV.getPortfolioById(id);
+
+  if (!p) {
+    document.getElementById('detail-root').innerHTML = `
+      <div style="padding:120px 64px;text-align:center">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:80px;color:var(--bone)">404</div>
+        <p style="font-size:16px;color:rgba(0,0,0,0.4);margin-bottom:32px">Portfolio tidak ditemukan.</p>
+        <a href="/portfolio-gallery/index.html" style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:var(--accent)">← Kembali ke Gallery</a>
+      </div>`;
+    return;
+  }
+
+  const s = ARKIV.getSettings();
+  ARKIV.injectSEO({
+    title: p.seoTitle || `${p.title} — ${s.siteName}`,
+    description: p.seoDescription || p.description,
+    keywords: p.seoKeywords,
+    ogImage: p.thumbnail,
+    canonical: `${s.siteUrl}/portfolio/${p.slug}`,
+    type: 'article',
+  });
+
+  // Schema: CreativeWork
+  const existing = document.querySelector('script[data-arkiv-work]');
+  if (existing) existing.remove();
+  const ld = document.createElement('script');
+  ld.type = 'application/ld+json';
+  ld.setAttribute('data-arkiv-work', '1');
+  ld.textContent = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "CreativeWork",
+    "name": p.title,
+    "description": p.description,
+    "image": p.thumbnail,
+    "creator": { "@type": "Organization", "name": s.siteName, "url": s.siteUrl },
+    "dateCreated": p.year,
+    "genre": p.category,
+    "client": p.client,
+  });
+  document.head.appendChild(ld);
+
+  const idx = portfolios.findIndex(x => x.id === p.id);
+  const prev = portfolios[idx - 1];
+  const next = portfolios[idx + 1];
+  const related = portfolios.filter(x => x.id !== p.id && x.category === p.category).slice(0, 3);
+  const fallbackRelated = portfolios.filter(x => x.id !== p.id).slice(0, 3);
+
+  document.getElementById('detail-root').innerHTML = `
+    <!-- HERO -->
+    <div class="detail-hero">
+      <img class="detail-hero-img" src="${p.thumbnail}" alt="${p.title}">
+      <div class="detail-hero-content">
+        <div class="detail-breadcrumb">
+          <a href="/portfolio-gallery/index.html">Gallery</a>
+          <span class="sep">/</span>
+          <span>${p.category}</span>
+          <span class="sep">/</span>
+          <span>${p.title}</span>
+        </div>
+        <div class="detail-category">${p.category}</div>
+        <h1 class="detail-title">${p.title}</h1>
+      </div>
+    </div>
+
+    <!-- META BAR -->
+    <div class="detail-meta-bar">
+      <div class="meta-cell"><label>Klien</label><span>${p.client}</span></div>
+      <div class="meta-cell"><label>Tahun</label><span>${p.year}</span></div>
+      <div class="meta-cell"><label>Kategori</label><span>${p.category}</span></div>
+      <div class="meta-cell"><label>Karya</label><span>${p.media.length} foto${p.media.length > 1 ? '' : ''}</span></div>
+    </div>
+
+    <!-- BODY -->
+    <div class="detail-body">
+      <p class="detail-desc">${p.description}</p>
+    </div>
+
+    <!-- MEDIA -->
+    <div class="detail-media">
+      <div class="media-grid">
+        ${p.media.map(m => `
+          <div class="media-item">
+            ${m.type === 'video'
+              ? `<video src="${m.src}" autoplay muted loop playsinline></video>`
+              : `<img src="${m.src}" alt="${m.caption}" loading="lazy">`}
+            ${m.caption ? `<div class="media-caption">${m.caption}</div>` : ''}
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <!-- RELATED -->
+    ${(related.length || fallbackRelated.length) ? `
+    <div class="related-section">
+      <div class="related-label">Lihat Juga</div>
+      <div class="related-title">Karya ${related.length ? 'Serupa' : 'Lainnya'}</div>
+      <div class="related-grid">
+        ${(related.length ? related : fallbackRelated).map(r => `
+          <div class="related-item" onclick="location.href='/portfolio-gallery/portfolio-detail.html?slug=${r.slug}'">
+            <img src="${r.thumbnail}" alt="${r.title}" loading="lazy">
+            <div class="related-item-info">
+              <div class="related-item-cat">${r.category}</div>
+              <div class="related-item-name">${r.title}</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>` : ''}
+
+    <!-- NAV -->
+    <div class="detail-nav">
+      ${prev ? `<a href="/portfolio-gallery/portfolio-detail.html?slug=${prev.slug}" class="nav-arrow">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 12H5M5 12l7-7M5 12l7 7"/></svg>
+        <div><span>Sebelumnya</span><span class="nav-arrow-title">${prev.title}</span></div>
+      </a>` : '<span></span>'}
+      ${next ? `<a href="/portfolio-gallery/portfolio-detail.html?slug=${next.slug}" class="nav-arrow" style="text-align:right;flex-direction:row-reverse">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M14 5l7 7-7 7"/></svg>
+        <div><span>Berikutnya</span><span class="nav-arrow-title">${next.title}</span></div>
+      </a>` : '<span></span>'}
+    </div>
+  `;
+}
+
+render();
+</script>
+</body>
+</html>

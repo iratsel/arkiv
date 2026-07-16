@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>ARKIV CMS — Pengaturan</title>
+<meta name="robots" content="noindex,nofollow">
+<script>if(!sessionStorage.getItem("arkiv_auth")){window.location.href="/portfolio-gallery/cms/login.html";}</script>
+<script src="/portfolio-gallery/js/data.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=Space+Mono:wght@400;700&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--white:#fff;--black:#0A0A0A;--ink:#1A1A1A;--bone:#E8E2D9;--accent:#FF3D00;--bg:#F5F4F2;--sidebar:220px;--green:#27ae60;--orange:#e67e22;--red:#c0392b}
+body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--bg);display:flex;min-height:100vh}
+/* ── SIDEBAR (reused) ── */
+.cms-sidebar{width:var(--sidebar);background:var(--black);min-height:100vh;position:fixed;top:0;left:0;display:flex;flex-direction:column;z-index:50}
+.cms-logo{padding:28px 24px 20px;border-bottom:1px solid rgba(255,255,255,0.08)}
+.cms-logo h1{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:0.2em;color:var(--white)}
+.cms-logo h1 span{color:var(--accent)}
+.cms-logo p{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.25);margin-top:4px}
+.cms-nav{flex:1;padding:16px 0}
+.cms-nav-group{margin-bottom:8px}
+.cms-nav-group-label{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:0.16em;text-transform:uppercase;color:rgba(255,255,255,0.2);padding:8px 24px 4px}
+.cms-nav a{display:flex;align-items:center;gap:12px;padding:11px 24px;color:rgba(255,255,255,0.5);text-decoration:none;font-size:13px;transition:all 0.2s;border-left:2px solid transparent}
+.cms-nav a:hover{color:var(--white);background:rgba(255,255,255,0.05)}
+.cms-nav a.active{color:var(--white);border-left-color:var(--accent);background:rgba(255,62,0,0.08)}
+.cms-nav a svg{width:15px;height:15px;flex-shrink:0;opacity:0.7}
+.cms-nav a.active svg{opacity:1}
+.cms-footer{padding:20px 24px;border-top:1px solid rgba(255,255,255,0.08)}
+.cms-footer a{display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.3);text-decoration:none;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;transition:color 0.2s}
+.cms-footer a:hover{color:var(--accent)}
+.cms-footer a svg{width:13px;height:13px}
+/* ── MAIN ── */
+.cms-main{margin-left:var(--sidebar);flex:1;display:flex;flex-direction:column}
+.cms-topbar{background:var(--white);border-bottom:1px solid var(--bone);padding:0 40px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40}
+.topbar-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.08em}
+.topbar-actions{display:flex;gap:10px;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:9px 20px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all 0.2s;text-decoration:none;white-space:nowrap}
+.btn-primary{background:var(--accent);color:var(--white)}
+.btn-primary:hover{background:#cc3000}
+.btn-outline{background:transparent;color:var(--ink);border:1px solid var(--bone)}
+.btn-outline:hover{border-color:var(--ink)}
+.btn-danger{background:transparent;color:var(--red);border:1px solid #fad7d5}
+.btn-danger:hover{background:var(--red);color:var(--white)}
+.btn svg{width:14px;height:14px}
+.cms-body{display:flex;flex:1}
+/* ── SETTINGS TABS ── */
+.settings-tabs{width:210px;background:var(--white);border-right:1px solid var(--bone);padding:16px 0;flex-shrink:0;position:sticky;top:60px;align-self:flex-start;height:calc(100vh - 60px);overflow-y:auto}
+.stab{display:flex;align-items:center;gap:12px;padding:12px 20px;cursor:pointer;transition:background 0.15s;border-left:2px solid transparent;font-size:13px;color:rgba(0,0,0,0.55)}
+.stab:hover{background:#faf9f7;color:var(--ink)}
+.stab.active{border-left-color:var(--accent);color:var(--ink);font-weight:500;background:#faf9f7}
+.stab svg{width:15px;height:15px;flex-shrink:0}
+.stab-group-label{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(0,0,0,0.3);padding:16px 20px 6px}
+/* ── SETTINGS CONTENT ── */
+.settings-content{flex:1;padding:32px 40px;overflow-y:auto}
+.settings-panel{display:none}
+.settings-panel.active{display:block}
+/* CARDS */
+.card{background:var(--white);border:1px solid var(--bone);margin-bottom:20px}
+.card-header{padding:18px 24px;border-bottom:1px solid var(--bone);display:flex;align-items:center;justify-content:space-between}
+.card-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:0.07em;color:var(--ink)}
+.card-subtitle{font-size:12px;color:rgba(0,0,0,0.4);margin-top:2px}
+.card-body{padding:24px;display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.card-body.cols1{grid-template-columns:1fr}
+.card-body.cols3{grid-template-columns:1fr 1fr 1fr}
+/* FORM */
+.form-group{margin-bottom:0}
+.form-group.full{grid-column:1/-1}
+.form-label{display:block;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(0,0,0,0.5);margin-bottom:7px}
+.form-input,.form-select,.form-textarea{width:100%;padding:10px 13px;border:1px solid var(--bone);background:var(--white);font-family:'DM Sans',sans-serif;font-size:14px;color:var(--ink);outline:none;transition:border-color 0.2s}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--ink)}
+.form-textarea{min-height:90px;resize:vertical;font-family:'Space Mono',monospace;font-size:12px}
+.form-hint{font-size:11px;color:rgba(0,0,0,0.35);margin-top:5px}
+.char-count{float:right;font-size:11px}
+.char-count.warn{color:var(--orange)}
+.char-count.bad{color:var(--red)}
+.seo-meter{height:5px;background:var(--bone);margin-top:5px}
+.seo-meter-bar{height:100%;transition:width 0.4s,background 0.4s}
+/* TOGGLE */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--bone)}
+.toggle-row:last-child{border-bottom:none}
+.toggle-info{}
+.toggle-label{font-size:14px;color:var(--ink)}
+.toggle-sub{font-size:12px;color:rgba(0,0,0,0.4);margin-top:2px}
+.toggle{position:relative;display:inline-block;width:40px;height:22px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;cursor:pointer;inset:0;background:var(--bone);transition:0.3s;border-radius:22px}
+.toggle-slider:before{position:absolute;content:"";height:16px;width:16px;left:3px;bottom:3px;background:white;transition:0.3s;border-radius:50%}
+input:checked+.toggle-slider{background:var(--accent)}
+input:checked+.toggle-slider:before{transform:translateX(18px)}
+/* COLOR PICKER */
+.color-row{display:flex;align-items:center;gap:10px}
+.color-swatch{width:36px;height:36px;border:1px solid var(--bone);cursor:pointer;flex-shrink:0}
+.color-preview{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.color-chip{width:28px;height:28px;cursor:pointer;border:2px solid transparent;transition:border-color 0.2s}
+.color-chip:hover,.color-chip.selected{border-color:var(--ink)}
+/* SERP */
+.serp-preview{padding:20px;background:#f8f9fa;border:1px solid #e0e0e0;margin-top:0}
+.serp-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(0,0,0,0.35);margin-bottom:12px}
+.serp-url{font-size:13px;color:#1a0dab;margin-bottom:2px}
+.serp-title{font-size:19px;color:#1a0dab;margin-bottom:4px}
+.serp-desc{font-size:13px;color:#4d5156;line-height:1.5}
+/* STATUS BADGES */
+.badge{display:inline-block;padding:3px 10px;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase}
+.badge-green{background:rgba(39,174,96,0.1);color:var(--green)}
+.badge-orange{background:rgba(230,126,34,0.1);color:var(--orange)}
+.badge-red{background:rgba(192,57,43,0.1);color:var(--red)}
+/* TOAST */
+.toast{position:fixed;bottom:32px;right:32px;background:var(--black);color:var(--white);padding:14px 24px;font-size:13px;display:none;align-items:center;gap:10px;z-index:999;animation:slideUp 0.3s cubic-bezier(0.16,1,0.3,1)}
+.toast.show{display:flex}
+.toast svg{width:16px;height:16px;color:var(--green);flex-shrink:0}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+/* DANGER ZONE */
+.danger-zone{border:1px solid #fad7d5;background:#fff8f8}
+.danger-zone .card-header{background:#fff0ee;border-bottom-color:#fad7d5}
+.danger-zone .card-title{color:var(--red)}
+/* PW STRENGTH */
+.pw-strength{height:4px;background:var(--bone);margin-top:6px;display:flex;gap:3px}
+.pw-seg{flex:1;height:100%;background:var(--bone);transition:background 0.3s}
+/* ROBOTS */
+.robots-editor{font-family:'Space Mono',monospace;font-size:12px;min-height:120px}
+/* OG preview */
+.og-preview{border:1px solid var(--bone);overflow:hidden;max-width:400px}
+.og-img{width:100%;height:160px;object-fit:cover;display:block;background:var(--bone)}
+.og-body{padding:12px 14px;background:var(--white)}
+.og-site{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(0,0,0,0.35);margin-bottom:4px}
+.og-title{font-size:15px;font-weight:500;color:var(--ink);margin-bottom:4px;line-height:1.3}
+.og-desc{font-size:13px;color:rgba(0,0,0,0.5);line-height:1.4}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="cms-sidebar">
+  <div class="cms-logo"><h1>ARK<span>IV</span></h1><p>Content Management</p></div>
+  <nav class="cms-nav">
+    <div class="cms-nav-group">
+      <div class="cms-nav-group-label">Utama</div>
+      <a href="/portfolio-gallery/cms/index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</a>
+    </div>
+    <div class="cms-nav-group">
+      <div class="cms-nav-group-label">Konten</div>
+      <a href="/portfolio-gallery/cms/portfolios.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>Portfolio</a>
+      <a href="/portfolio-gallery/cms/pages.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/></svg>Halaman</a>
+    </div>
+    <div class="cms-nav-group">
+      <div class="cms-nav-group-label">Konfigurasi</div>
+      <a href="/portfolio-gallery/cms/settings.html" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Pengaturan & SEO</a>
+    </div>
+  </nav>
+  <div class="cms-footer"><a href="/portfolio-gallery/index.html" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15,3 21,3 21,9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Lihat Website</a></div>
+</aside>
+
+<!-- MAIN -->
+<div class="cms-main">
+  <div class="cms-topbar">
+    <div class="topbar-title">Pengaturan & SEO</div>
+    <div class="topbar-actions">
+      <button class="btn btn-outline" onclick="resetSettings()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="1,4 1,10 7,10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+        Reset Default
+      </button>
+      <button class="btn btn-primary" onclick="saveAll()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>
+        Simpan Semua
+      </button>
+    </div>
+  </div>
+
+  <div class="cms-body">
+    <!-- SETTINGS TABS -->
+    <div class="settings-tabs">
+      <div class="stab-group-label">Website</div>
+      <div class="stab active" onclick="switchTab('general')" id="stab-general">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+        Umum
+      </div>
+      <div class="stab" onclick="switchTab('identity')" id="stab-identity">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 12h6M9 15h4"/></svg>
+        Identitas & Kontak
+      </div>
+      <div class="stab" onclick="switchTab('social')" id="stab-social">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        Sosial Media
+      </div>
+      <div class="stab-group-label">SEO</div>
+      <div class="stab" onclick="switchTab('seo-global')" id="stab-seo-global">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        SEO Global
+      </div>
+      <div class="stab" onclick="switchTab('opengraph')" id="stab-opengraph">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="14" rx="2"/><path d="M3 9h18"/></svg>
+        Open Graph
+      </div>
+      <div class="stab" onclick="switchTab('analytics')" id="stab-analytics">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg>
+        Analytics & Verifikasi
+      </div>
+      <div class="stab" onclick="switchTab('robots')" id="stab-robots">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        Robots & Crawling
+      </div>
+      <div class="stab-group-label">Akun</div>
+      <div class="stab" onclick="switchTab('security')" id="stab-security">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Keamanan & Login
+      </div>
+      <div class="stab" onclick="switchTab('data')" id="stab-data">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+        Data & Backup
+      </div>
+    </div>
+
+    <!-- SETTINGS CONTENT -->
+    <div class="settings-content">
+
+      <!-- ── GENERAL ── -->
+      <div class="settings-panel active" id="panel-general">
+        <div class="card">
+          <div class="card-header"><div><div class="card-title">Informasi Website</div><div class="card-subtitle">Nama, tagline, dan deskripsi dasar website Anda</div></div></div>
+          <div class="card-body">
+            <div class="form-group">
+              <label class="form-label">Nama Website</label>
+              <input class="form-input" id="s-siteName" placeholder="ARKIV">
+              <div class="form-hint">Tampil di tab browser, header, dan footer</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Logo Text</label>
+              <input class="form-input" id="s-logoText" placeholder="ARKIV">
+              <div class="form-hint">Teks logo di sidebar navigasi</div>
+            </div>
+            <div class="form-group full">
+              <label class="form-label">Tagline</label>
+              <input class="form-input" id="s-siteTagline" placeholder="Photography & Visual Design Studio">
+            </div>
+            <div class="form-group full">
+              <label class="form-label">Deskripsi Website</label>
+              <textarea class="form-textarea" id="s-siteDescription" style="min-height:80px"></textarea>
+              <div class="form-hint">Deskripsi umum website untuk referensi internal dan schema.org</div>
+            </div>
+            <div class="form-group full">
+              <label class="form-label">URL Website</label>
+              <input class="form-input" id="s-siteUrl" placeholder="https://arkiv.studio">
+              <div class="form-hint">URL lengkap termasuk https://. Digunakan untuk canonical URL dan sitemap.</div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Warna Aksen</div></div>
+          <div class="card-body cols1">
+            <div class="form-group">
+              <label class="form-label">Warna Utama</label>
+              <div class="color-row">
+                <input type="color" class="color-swatch" id="s-accentColor" value="#FF3D00">
+                <input class="form-input" id="s-accentHex" placeholder="#FF3D00" style="flex:1" oninput="syncColorFromHex()">
+              </div>
+              <div class="color-preview" id="color-presets">
+                <div class="color-chip" style="background:#FF3D00" onclick="setColor('#FF3D00')" title="ARKIV Red"></div>
+                <div class="color-chip" style="background:#2563EB" onclick="setColor('#2563EB')" title="Classic Blue"></div>
+                <div class="color-chip" style="background:#059669" onclick="setColor('#059669')" title="Emerald"></div>
+                <div class="color-chip" style="background:#7C3AED" onclick="setColor('#7C3AED')" title="Violet"></div>
+                <div class="color-chip" style="background:#D97706" onclick="setColor('#D97706')" title="Amber"></div>
+                <div class="color-chip" style="background:#DB2777" onclick="setColor('#DB2777')" title="Pink"></div>
+                <div class="color-chip" style="background:#0A0A0A" onclick="setColor('#0A0A0A')" title="Black"></div>
+              </div>
+              <div class="form-hint">Warna aksen digunakan di link aktif, border highlight, dan elemen CTA.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── IDENTITY ── -->
+      <div class="settings-panel" id="panel-identity">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Informasi Kontak</div></div>
+          <div class="card-body">
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input class="form-input" id="s-siteEmail" type="email" placeholder="hello@studio.com">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Telepon</label>
+              <input class="form-input" id="s-sitePhone" placeholder="+62 812 3456 7890">
+            </div>
+            <div class="form-group full">
+              <label class="form-label">Alamat Lengkap</label>
+              <input class="form-input" id="s-siteAddress" placeholder="Jl. Contoh No. 1, Kota, Indonesia">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SOCIAL ── -->
+      <div class="settings-panel" id="panel-social">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Sosial Media & Portfolio</div></div>
+          <div class="card-body">
+            <div class="form-group">
+              <label class="form-label">Instagram</label>
+              <input class="form-input" id="s-siteInstagram" placeholder="@username">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Behance</label>
+              <input class="form-input" id="s-siteBehance" placeholder="behance.net/username">
+            </div>
+            <div class="form-group">
+              <label class="form-label">LinkedIn</label>
+              <input class="form-input" id="s-siteLinkedin" placeholder="linkedin.com/in/username">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Website Lain</label>
+              <input class="form-input" id="s-siteOther" placeholder="https://...">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SEO GLOBAL ── -->
+      <div class="settings-panel" id="panel-seo-global">
+        <div class="card">
+          <div class="card-header"><div><div class="card-title">SEO Default</div><div class="card-subtitle">Digunakan pada halaman yang tidak memiliki SEO spesifik</div></div></div>
+          <div class="card-body cols1">
+            <div class="form-group">
+              <label class="form-label">Default SEO Title <span id="dst-cc" class="char-count">0/60</span></label>
+              <input class="form-input" id="s-defaultSeoTitle" oninput="seoMeter('s-defaultSeoTitle','dst-cc',60,'dst-m')">
+              <div class="seo-meter"><div class="seo-meter-bar" id="dst-m" style="width:0"></div></div>
+              <div class="form-hint">Ideal 50–60 karakter. Tampil sebagai judul di tab browser dan Google.</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Default Meta Description <span id="dsd-cc" class="char-count">0/160</span></label>
+              <textarea class="form-textarea" id="s-defaultSeoDescription" style="min-height:80px" oninput="seoMeter('s-defaultSeoDescription','dsd-cc',160,'dsd-m')"></textarea>
+              <div class="seo-meter"><div class="seo-meter-bar" id="dsd-m" style="width:0"></div></div>
+              <div class="form-hint">Ideal 120–160 karakter. Tampil sebagai deskripsi di hasil pencarian Google.</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Default Keywords</label>
+              <input class="form-input" id="s-defaultSeoKeywords" placeholder="keyword1, keyword2, keyword3">
+              <div class="form-hint">Pisahkan dengan koma. Untuk meta keywords (pengaruh SEO modern minimal, tapi tetap berguna).</div>
+            </div>
+          </div>
+        </div>
+        <!-- SERP PREVIEW -->
+        <div class="card">
+          <div class="card-header"><div class="card-title">Preview Google SERP</div></div>
+          <div class="card-body cols1">
+            <div class="serp-preview">
+              <div class="serp-label">Tampilan di Google Search</div>
+              <div class="serp-url" id="serp-url">arkiv.studio</div>
+              <div class="serp-title" id="serp-title">—</div>
+              <div class="serp-desc" id="serp-desc">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── OPEN GRAPH ── -->
+      <div class="settings-panel" id="panel-opengraph">
+        <div class="card">
+          <div class="card-header"><div><div class="card-title">Open Graph & Social Sharing</div><div class="card-subtitle">Tampilan saat link dibagikan di media sosial</div></div></div>
+          <div class="card-body cols1">
+            <div class="form-group">
+              <label class="form-label">OG Image URL</label>
+              <input class="form-input" id="s-ogImage" placeholder="https://..." oninput="updateOGPreview()">
+              <div class="form-hint">Ukuran ideal: 1200×630px. Format: JPG atau PNG.</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Preview Kartu Sosial</label>
+              <div class="og-preview">
+                <img class="og-img" id="og-preview-img" src="" alt="OG Preview" onerror="this.style.background='var(--bone)'">
+                <div class="og-body">
+                  <div class="og-site" id="og-preview-site">arkiv.studio</div>
+                  <div class="og-title" id="og-preview-title">—</div>
+                  <div class="og-desc" id="og-preview-desc">—</div>
+                </div>
+              </div>
+              <div class="form-hint" style="margin-top:8px">Preview tampilan saat link dibagikan di Facebook, Twitter/X, WhatsApp, dll.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── ANALYTICS ── -->
+      <div class="settings-panel" id="panel-analytics">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Google Analytics</div></div>
+          <div class="card-body cols1">
+            <div class="form-group">
+              <label class="form-label">Google Analytics 4 — Measurement ID</label>
+              <input class="form-input" id="s-googleAnalyticsId" placeholder="G-XXXXXXXXXX">
+              <div class="form-hint">Format: G-XXXXXXXXXX. Kosongkan jika tidak menggunakan GA4.</div>
+            </div>
+            <div class="form-group">
+              <div id="ga-status"></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Verifikasi Search Console & Lainnya</div></div>
+          <div class="card-body cols1">
+            <div class="form-group">
+              <label class="form-label">Google Search Console — Verification Code</label>
+              <input class="form-input" id="s-googleVerification" placeholder="google-site-verification=XXXXXXX">
+              <div class="form-hint">Salin kode dari Google Search Console → Verify via meta tag.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── ROBOTS ── -->
+      <div class="settings-panel" id="panel-robots">
+        <div class="card">
+          <div class="card-header"><div><div class="card-title">robots.txt</div><div class="card-subtitle">Kontrol akses crawler/bot ke halaman website Anda</div></div></div>
+          <div class="card-body cols1">
+            <div class="form-group">
+              <label class="form-label">Isi robots.txt</label>
+              <textarea class="form-textarea robots-editor" id="s-robotsTxt" style="min-height:160px"></textarea>
+              <div class="form-hint">File ini memberi tahu mesin pencari halaman mana yang boleh dan tidak boleh diindeks.</div>
+            </div>
+            <div class="form-group">
+              <div style="display:flex;gap:10px;flex-wrap:wrap">
+                <button class="btn btn-outline" onclick="setRobots('all')" style="font-size:12px;padding:7px 14px">Izinkan Semua</button>
+                <button class="btn btn-outline" onclick="setRobots('nocms')" style="font-size:12px;padding:7px 14px">Sembunyikan CMS</button>
+                <button class="btn btn-outline" onclick="setRobots('noindex')" style="font-size:12px;padding:7px 14px">Blokir Semua (Dev Mode)</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Pengaturan Indexing</div></div>
+          <div class="card-body cols1">
+            <div style="padding:0 0 4px">
+              <div class="toggle-row">
+                <div class="toggle-info"><div class="toggle-label">Izinkan Indexing Halaman Portfolio</div><div class="toggle-sub">Halaman detail portfolio dapat diindeks Google</div></div>
+                <label class="toggle"><input type="checkbox" id="t-indexPortfolio" checked><span class="toggle-slider"></span></label>
+              </div>
+              <div class="toggle-row">
+                <div class="toggle-info"><div class="toggle-label">Larang Indexing Halaman CMS</div><div class="toggle-sub">Folder /cms/ tidak muncul di Google (direkomendasikan)</div></div>
+                <label class="toggle"><input type="checkbox" id="t-noCMS" checked><span class="toggle-slider"></span></label>
+              </div>
+              <div class="toggle-row">
+                <div class="toggle-info"><div class="toggle-label">Canonical URL Otomatis</div><div class="toggle-sub">Tambahkan tag canonical secara otomatis ke setiap halaman</div></div>
+                <label class="toggle"><input type="checkbox" id="t-canonical" checked><span class="toggle-slider"></span></label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SECURITY ── -->
+      <div class="settings-panel" id="panel-security">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Ganti Password Admin</div></div>
+          <div class="card-body cols1">
+            <div class="form-group">
+              <label class="form-label">Username</label>
+              <input class="form-input" id="pw-username" placeholder="admin">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Password Lama</label>
+              <input class="form-input" type="password" id="pw-old" placeholder="••••••••">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Password Baru</label>
+              <input class="form-input" type="password" id="pw-new" placeholder="••••••••" oninput="checkPwStrength()">
+              <div class="pw-strength">
+                <div class="pw-seg" id="pws1"></div>
+                <div class="pw-seg" id="pws2"></div>
+                <div class="pw-seg" id="pws3"></div>
+                <div class="pw-seg" id="pws4"></div>
+              </div>
+              <div class="form-hint" id="pw-hint">Minimal 8 karakter, kombinasi huruf dan angka.</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Konfirmasi Password Baru</label>
+              <input class="form-input" type="password" id="pw-confirm" placeholder="••••••••">
+            </div>
+            <div class="form-group">
+              <button class="btn btn-primary" onclick="changePassword()">Ganti Password</button>
+              <div id="pw-msg" style="margin-top:12px;font-size:13px;display:none"></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Sesi</div></div>
+          <div class="card-body cols1">
+            <div class="toggle-row">
+              <div class="toggle-info"><div class="toggle-label">Auto-logout setelah tidak aktif</div><div class="toggle-sub">Sesi berakhir setelah 30 menit tidak aktif</div></div>
+              <label class="toggle"><input type="checkbox" id="t-autologout" checked><span class="toggle-slider"></span></label>
+            </div>
+            <div style="padding-top:16px">
+              <button class="btn btn-danger" onclick="logout()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:14px;height:14px"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16,17 21,12 16,7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                Logout Sekarang
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── DATA ── -->
+      <div class="settings-panel" id="panel-data">
+        <div class="card">
+          <div class="card-header"><div><div class="card-title">Export Data</div><div class="card-subtitle">Unduh semua data sebagai file JSON untuk backup</div></div></div>
+          <div class="card-body cols1">
+            <div style="display:flex;gap:12px;flex-wrap:wrap">
+              <button class="btn btn-outline" onclick="exportData('portfolios')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:14px;height:14px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Export Portfolio
+              </button>
+              <button class="btn btn-outline" onclick="exportData('pages')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:14px;height:14px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Export Halaman
+              </button>
+              <button class="btn btn-outline" onclick="exportData('settings')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:14px;height:14px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Export Settings
+              </button>
+              <button class="btn btn-primary" onclick="exportData('all')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:14px;height:14px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Export Semua (Full Backup)
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div><div class="card-title">Import Data</div><div class="card-subtitle">Pulihkan data dari file backup JSON</div></div></div>
+          <div class="card-body cols1">
+            <div class="form-group">
+              <label class="form-label">File JSON Backup</label>
+              <input type="file" id="import-file" accept=".json" class="form-input" style="padding:8px">
+            </div>
+            <div class="form-group">
+              <button class="btn btn-outline" onclick="importData()">Import & Pulihkan Data</button>
+              <div class="form-hint" style="margin-top:8px">⚠️ Import akan menimpa semua data yang ada saat ini.</div>
+            </div>
+          </div>
+        </div>
+        <div class="card danger-zone">
+          <div class="card-header"><div><div class="card-title">Danger Zone</div><div class="card-subtitle">Tindakan ini tidak dapat dibatalkan</div></div></div>
+          <div class="card-body cols1">
+            <div style="display:flex;gap:12px;flex-wrap:wrap">
+              <button class="btn btn-danger" onclick="resetSection('portfolios')">Reset Portfolio ke Default</button>
+              <button class="btn btn-danger" onclick="resetSection('pages')">Reset Halaman ke Default</button>
+              <button class="btn btn-danger" onclick="resetSection('settings')">Reset Pengaturan ke Default</button>
+              <button class="btn btn-danger" onclick="resetSection('all')" style="background:#c0392b;color:white;border-color:#c0392b">⚠ Reset Semua Data</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /settings-content -->
+  </div><!-- /cms-body -->
+</div><!-- /cms-main -->
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20,6 9,17 4,12"/></svg>
+  <span id="toast-msg">Pengaturan berhasil disimpan</span>
+</div>
+
+<script>
+let s = ARKIV.getSettings();
+
+// ── INIT ──
+function loadSettings() {
+  const fields = ['siteName','logoText','siteTagline','siteDescription','siteUrl',
+    'siteEmail','sitePhone','siteAddress','siteInstagram','siteBehance','siteLinkedin',
+    'defaultSeoTitle','defaultSeoDescription','defaultSeoKeywords','googleAnalyticsId',
+    'googleVerification','ogImage','robotsTxt','accentColor'];
+  fields.forEach(k => {
+    const el = document.getElementById('s-' + k);
+    if (el) el.value = s[k] || '';
+  });
+  document.getElementById('s-accentHex').value = s.accentColor || '#FF3D00';
+  document.getElementById('s-accentColor').value = s.accentColor || '#FF3D00';
+  // SEO meters
+  seoMeter('s-defaultSeoTitle','dst-cc',60,'dst-m');
+  seoMeter('s-defaultSeoDescription','dsd-cc',160,'dsd-m');
+  updateSERPPreview();
+  updateOGPreview();
+  updateGAStatus();
+  // pw username prefill
+  const creds = JSON.parse(localStorage.getItem('arkiv_credentials') || '{"username":"admin"}');
+  document.getElementById('pw-username').value = creds.username;
+}
+
+// ── TAB SWITCH ──
+function switchTab(name) {
+  document.querySelectorAll('.stab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.settings-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('stab-' + name).classList.add('active');
+  document.getElementById('panel-' + name).classList.add('active');
+}
+
+// ── SAVE ALL ──
+function saveAll() {
+  const fields = ['siteName','logoText','siteTagline','siteDescription','siteUrl',
+    'siteEmail','sitePhone','siteAddress','siteInstagram','siteBehance','siteLinkedin',
+    'defaultSeoTitle','defaultSeoDescription','defaultSeoKeywords','googleAnalyticsId',
+    'googleVerification','ogImage','robotsTxt'];
+  fields.forEach(k => {
+    const el = document.getElementById('s-' + k);
+    if (el) s[k] = el.value.trim();
+  });
+  s.accentColor = document.getElementById('s-accentHex').value;
+  ARKIV.setSettings(s);
+  showToast('Semua pengaturan berhasil disimpan!');
+}
+
+// ── RESET ──
+function resetSettings() {
+  if (!confirm('Reset semua pengaturan ke nilai default?')) return;
+  s = JSON.parse(JSON.stringify(ARKIV.DEFAULT_SETTINGS));
+  ARKIV.setSettings(s);
+  loadSettings();
+  showToast('Pengaturan direset ke default');
+}
+
+// ── SEO METER ──
+function seoMeter(fieldId, countId, max, barId) {
+  const val = document.getElementById(fieldId)?.value || '';
+  const len = val.length;
+  const cc = document.getElementById(countId);
+  if (cc) { cc.textContent = `${len}/${max}`; cc.className = 'char-count' + (len>max?' bad':len>max*0.9?' warn':''); }
+  const bar = document.getElementById(barId);
+  if (bar) { bar.style.width = Math.min(len/max*100,100)+'%'; bar.style.background = len<max*0.5?'#e67e22':len<=max?'#27ae60':'#c0392b'; }
+  updateSERPPreview();
+}
+
+function updateSERPPreview() {
+  const t = document.getElementById('s-defaultSeoTitle')?.value || '';
+  const d = document.getElementById('s-defaultSeoDescription')?.value || '';
+  const url = (document.getElementById('s-siteUrl')?.value || 'https://arkiv.studio').replace(/https?:\/\//,'');
+  document.getElementById('serp-url').textContent = url;
+  document.getElementById('serp-title').textContent = t || '(belum diisi)';
+  document.getElementById('serp-desc').textContent = d || '(belum diisi)';
+}
+
+// ── OG PREVIEW ──
+function updateOGPreview() {
+  const img = document.getElementById('s-ogImage')?.value || '';
+  const t = document.getElementById('s-defaultSeoTitle')?.value || s.defaultSeoTitle || '';
+  const d = document.getElementById('s-defaultSeoDescription')?.value || s.defaultSeoDescription || '';
+  const url = (document.getElementById('s-siteUrl')?.value || s.siteUrl || '').replace(/https?:\/\//,'');
+  document.getElementById('og-preview-img').src = img;
+  document.getElementById('og-preview-site').textContent = url;
+  document.getElementById('og-preview-title').textContent = t || '(belum diisi)';
+  document.getElementById('og-preview-desc').textContent = d ? d.substring(0,120)+(d.length>120?'...':'') : '(belum diisi)';
+}
+
+// ── COLOR ──
+function setColor(hex) {
+  document.getElementById('s-accentColor').value = hex;
+  document.getElementById('s-accentHex').value = hex;
+  document.querySelectorAll('.color-chip').forEach(c => c.classList.toggle('selected', c.style.background === hex || c.style.backgroundColor === hex));
+}
+function syncColorFromHex() {
+  const hex = document.getElementById('s-accentHex').value;
+  if (/^#[0-9A-Fa-f]{6}$/.test(hex)) document.getElementById('s-accentColor').value = hex;
+}
+document.getElementById('s-accentColor').addEventListener('input', function() {
+  document.getElementById('s-accentHex').value = this.value;
+});
+
+// ── ROBOTS PRESETS ──
+function setRobots(mode) {
+  const presets = {
+    all: 'User-agent: *\nAllow: /\n\nSitemap: https://arkiv.studio/sitemap.xml',
+    nocms: 'User-agent: *\nAllow: /\nDisallow: /cms/\n\nSitemap: https://arkiv.studio/sitemap.xml',
+    noindex: 'User-agent: *\nDisallow: /',
+  };
+  document.getElementById('s-robotsTxt').value = presets[mode];
+}
+
+// ── GA STATUS ──
+function updateGAStatus() {
+  const id = document.getElementById('s-googleAnalyticsId')?.value || '';
+  const el = document.getElementById('ga-status');
+  if (!el) return;
+  if (!id) { el.innerHTML = '<span class="badge badge-orange">Tidak Terpasang</span> <span style="font-size:12px;color:rgba(0,0,0,0.4);margin-left:8px">Google Analytics belum dikonfigurasi</span>'; }
+  else if (/^G-[A-Z0-9]+$/.test(id)) { el.innerHTML = `<span class="badge badge-green">Format Valid</span> <span style="font-size:12px;color:rgba(0,0,0,0.4);margin-left:8px">ID GA4 terdeteksi: ${id}</span>`; }
+  else { el.innerHTML = '<span class="badge badge-red">Format Salah</span> <span style="font-size:12px;color:rgba(0,0,0,0.4);margin-left:8px">Format harus G-XXXXXXXXXX</span>'; }
+}
+document.getElementById('s-googleAnalyticsId')?.addEventListener('input', updateGAStatus);
+
+// ── PASSWORD ──
+function checkPwStrength() {
+  const pw = document.getElementById('pw-new').value;
+  const segs = [document.getElementById('pws1'),document.getElementById('pws2'),document.getElementById('pws3'),document.getElementById('pws4')];
+  let score = 0;
+  if (pw.length >= 8) score++;
+  if (/[A-Z]/.test(pw)) score++;
+  if (/[0-9]/.test(pw)) score++;
+  if (/[^A-Za-z0-9]/.test(pw)) score++;
+  const colors = ['#c0392b','#e67e22','#27ae60','#27ae60'];
+  segs.forEach((s,i) => s.style.background = i < score ? colors[score-1] : 'var(--bone)');
+  const hints = ['Sangat lemah','Lemah','Cukup kuat','Kuat'];
+  document.getElementById('pw-hint').textContent = pw.length ? hints[Math.max(0,score-1)] : 'Minimal 8 karakter, kombinasi huruf dan angka.';
+}
+
+function changePassword() {
+  const uname = document.getElementById('pw-username').value.trim();
+  const oldPw = document.getElementById('pw-old').value;
+  const newPw = document.getElementById('pw-new').value;
+  const confPw = document.getElementById('pw-confirm').value;
+  const msg = document.getElementById('pw-msg');
+  const creds = JSON.parse(localStorage.getItem('arkiv_credentials') || '{"username":"admin","password":"arkiv2024"}');
+
+  msg.style.display = 'block';
+  if (!uname || !oldPw || !newPw || !confPw) { msg.style.color='#c0392b'; msg.textContent='Semua field harus diisi.'; return; }
+  if (oldPw !== creds.password) { msg.style.color='#c0392b'; msg.textContent='Password lama salah.'; return; }
+  if (newPw.length < 8) { msg.style.color='#c0392b'; msg.textContent='Password baru minimal 8 karakter.'; return; }
+  if (newPw !== confPw) { msg.style.color='#c0392b'; msg.textContent='Konfirmasi password tidak cocok.'; return; }
+  localStorage.setItem('arkiv_credentials', JSON.stringify({ username: uname, password: newPw }));
+  msg.style.color='#27ae60'; msg.textContent='Password berhasil diubah! Silakan login ulang.';
+  document.getElementById('pw-old').value=''; document.getElementById('pw-new').value=''; document.getElementById('pw-confirm').value='';
+}
+
+function logout() {
+  sessionStorage.removeItem('arkiv_auth');
+  window.location.href = '/portfolio-gallery/cms/login.html';
+}
+
+// ── EXPORT ──
+function exportData(type) {
+  let data = {};
+  if (type === 'all') { data = { portfolios: ARKIV.getPortfolios(), pages: ARKIV.getPages(), settings: ARKIV.getSettings(), exportedAt: new Date().toISOString() }; }
+  else if (type === 'portfolios') { data = { portfolios: ARKIV.getPortfolios(), exportedAt: new Date().toISOString() }; }
+  else if (type === 'pages') { data = { pages: ARKIV.getPages(), exportedAt: new Date().toISOString() }; }
+  else if (type === 'settings') { data = { settings: ARKIV.getSettings(), exportedAt: new Date().toISOString() }; }
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = `arkiv-backup-${type}-${new Date().toISOString().slice(0,10)}.json`;
+  a.click(); URL.revokeObjectURL(a.href);
+  showToast(`Export ${type} berhasil diunduh`);
+}
+
+function importData() {
+  const file = document.getElementById('import-file').files[0];
+  if (!file) { alert('Pilih file JSON terlebih dahulu.'); return; }
+  if (!confirm('Import akan menimpa data yang ada sekarang. Lanjutkan?')) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (data.portfolios) ARKIV.setPortfolios(data.portfolios);
+      if (data.pages) ARKIV.setPages(data.pages);
+      if (data.settings) { ARKIV.setSettings(data.settings); s = data.settings; loadSettings(); }
+      showToast('Data berhasil diimport!');
+    } catch { alert('File JSON tidak valid atau rusak.'); }
+  };
+  reader.readAsText(file);
+}
+
+function resetSection(type) {
+  const labels = { portfolios:'data portfolio', pages:'konten halaman', settings:'pengaturan', all:'SEMUA data' };
+  if (!confirm(`Reset ${labels[type]} ke default? Tindakan ini tidak dapat dibatalkan.`)) return;
+  if (type === 'portfolios' || type === 'all') ARKIV.setPortfolios(JSON.parse(JSON.stringify(ARKIV.DEFAULT_PORTFOLIOS)));
+  if (type === 'pages' || type === 'all') ARKIV.setPages(JSON.parse(JSON.stringify(ARKIV.DEFAULT_PAGES)));
+  if (type === 'settings' || type === 'all') { s = JSON.parse(JSON.stringify(ARKIV.DEFAULT_SETTINGS)); ARKIV.setSettings(s); loadSettings(); }
+  showToast(`Reset ${labels[type]} berhasil`);
+}
+
+// ── TOAST ──
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── START ──
+loadSettings();
+</script>
+</body>
+</html>
