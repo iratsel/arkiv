@@ -333,15 +333,15 @@ const ARKIV = (() => {
     const logoB = logoText.slice(half);
 
     const nav = [
-      { id: 'gallery', href: '/portfolio-gallery/index.html', icon: `<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>`, label: 'Gallery' },
-      { id: 'about',   href: '/portfolio-gallery/about.html',    icon: `<circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>`, label: 'About' },
-      { id: 'services',href: '/portfolio-gallery/services.html', icon: `<path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z"/>`, label: 'Services' },
-      { id: 'contact', href: '/portfolio-gallery/contact.html',  icon: `<path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>`, label: 'Contact' },
+      { id: 'gallery', href: 'index.html', icon: `<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>`, label: 'Gallery' },
+      { id: 'about',   href: 'about.html',    icon: `<circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>`, label: 'About' },
+      { id: 'services',href: 'services.html', icon: `<path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z"/>`, label: 'Services' },
+      { id: 'contact', href: 'contact.html',  icon: `<path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>`, label: 'Contact' },
     ];
 
     return `
     <nav id="sidebar">
-      <div class="sidebar-logo" onclick="location.href='/portfolio-gallery/index.html'">${logoA}<span>${logoB}</span></div>
+      <div class="sidebar-logo" onclick="location.href='index.html'">${logoA}<span>${logoB}</span></div>
       <ul class="nav-links">
         ${nav.map(n => `
         <li>
