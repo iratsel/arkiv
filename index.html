@@ -81,7 +81,7 @@ body:hover #cms-link{opacity:0.3}
 </div>
 
 <!-- CMS shortcut -->
-<div id="cms-link"><a href="/portfolio-gallery/cms/login.html">⚙ CMS</a></div>
+<div id="cms-link"><a href="cms/login.html">⚙ CMS</a></div>
 
 <script>
 // ── INIT SEO ──
@@ -165,7 +165,7 @@ function setupProximityEffect() {
 document.getElementById('gallery-track').addEventListener('click', e => {
   const item = e.target.closest('.gallery-item');
   if (item) {
-    window.location.href = `/portfolio-gallery/portfolio-detail.html?slug=${item.dataset.slug}`;
+    window.location.href = `portfolio-detail.html?slug=${item.dataset.slug}`;
   }
 });
 
